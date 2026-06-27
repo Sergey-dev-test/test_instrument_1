@@ -1,0 +1,44 @@
+/* ─── SQL Export Modal ──────────────────────────────────────── */
+
+.sql-modal {
+  min-width: 600px;
+  max-width: 700px;
+}
+
+.sql-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.sql-modal-header h3 {
+  margin-bottom: 0;
+}
+
+.sql-output {
+  width: 100%;
+  height: 400px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px;
+  color: #a5f3fc;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+  tab-size: 2;
+}
+
+.sql-output::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sql-modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}

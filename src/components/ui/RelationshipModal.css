@@ -1,0 +1,132 @@
+/* ─── Relationship Info ─────────────────────────────────────── */
+
+.relationship-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px;
+  background: var(--color-bg);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.relationship-source,
+.relationship-target {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-label {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.info-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-accent);
+  font-family: monospace;
+}
+
+.relationship-arrow {
+  font-size: 18px;
+  color: var(--color-text-muted);
+}
+
+/* ─── Relationship Options ──────────────────────────────────── */
+
+.relationship-options {
+  margin-bottom: 16px;
+}
+
+.options-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.option-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.option-btn:hover {
+  border-color: var(--color-accent);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.option-btn.active {
+  border-color: var(--color-accent);
+  background: rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.option-icon {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: monospace;
+  min-width: 60px;
+  color: var(--color-accent);
+}
+
+.option-label {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* ─── Notation Preview ──────────────────────────────────────── */
+
+.notation-preview {
+  padding: 12px;
+  background: var(--color-bg);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.preview-label {
+  display: block;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+}
+
+.notation-diagram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.notation-node {
+  padding: 4px 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+.notation-line {
+  letter-spacing: 2px;
+}

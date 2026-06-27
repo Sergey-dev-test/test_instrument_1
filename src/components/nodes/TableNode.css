@@ -1,0 +1,253 @@
+/* ─── Table Node ────────────────────────────────────────────── */
+
+.table-node {
+  width: 320px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  overflow: visible;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  position: relative;
+}
+
+.table-node:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.table-node.selected {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25), 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* ─── Header ───────────────────────────────────────────────── */
+
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--table-header-height);
+  padding: 0 14px;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
+  border-radius: 8px 8px 0 0;
+  cursor: grab;
+  user-select: none;
+}
+
+.table-header:active {
+  cursor: grabbing;
+}
+
+.table-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table-field-count {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+/* ─── Divider ───────────────────────────────────────────────── */
+
+.table-divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 0 14px;
+}
+
+/* ─── Fields Container ──────────────────────────────────────── */
+
+.table-fields {
+  padding: 4px 0;
+  position: relative;
+}
+
+/* ─── Field Row ─────────────────────────────────────────────── */
+
+.field-row {
+  display: flex;
+  align-items: center;
+  height: var(--table-field-height);
+  padding: 0 10px 0 14px;
+  gap: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  position: relative;
+  transition: background 0.15s ease;
+}
+
+.field-row:last-child {
+  border-bottom: none;
+}
+
+.field-row:hover {
+  filter: brightness(1.05);
+}
+
+.field-row.primary-key {
+  border-left: 3px solid #f59e0b;
+}
+
+/* ─── Field Handles (connection dots) ───────────────────────── */
+
+.field-handle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--color-accent);
+  background: var(--color-surface);
+  cursor: crosshair;
+  transition: all 0.15s ease;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+}
+
+.field-row:hover .field-handle {
+  opacity: 1;
+}
+
+.field-handle:hover {
+  background: var(--color-accent);
+  transform: translateY(-50%) scale(1.3);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+.field-handle-source {
+  left: -18px;
+}
+
+.field-handle-target {
+  right: -18px;
+}
+
+/* ─── Field Icon ────────────────────────────────────────────── */
+
+.field-icon {
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 22px;
+  text-align: center;
+  font-family: monospace;
+  border-radius: 3px;
+  padding: 1px 3px;
+  flex-shrink: 0;
+}
+
+/* ─── Field Name ────────────────────────────────────────────── */
+
+.field-name {
+  flex: 1;
+  font-size: 13px;
+  color: var(--color-text);
+  cursor: text;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.field-name-input {
+  flex: 1;
+  font-size: 13px;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-accent);
+  border-radius: 3px;
+  padding: 2px 6px;
+  outline: none;
+  min-width: 0;
+}
+
+/* ─── Field Type Label ──────────────────────────────────────── */
+
+.field-type {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  font-family: monospace;
+  flex-shrink: 0;
+  min-width: 45px;
+  text-align: right;
+}
+
+/* ─── Field Badges ──────────────────────────────────────────── */
+
+.field-badges {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+  line-height: 1.4;
+}
+
+.badge.pk {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge.nn {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.badge.ai {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+/* ─── Remove Button ─────────────────────────────────────────── */
+
+.field-remove-btn {
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.field-row:hover .field-remove-btn {
+  opacity: 1;
+}
+
+.field-remove-btn:hover {
+  background: var(--color-danger);
+  color: white;
+}
+
+/* ─── Right Handles Container ───────────────────────────────── */
+
+.table-handles-right {
+  position: absolute;
+  right: -24px;
+  top: 0;
+  height: 100%;
+  pointer-events: none;
+}
+
+.table-handles-right .field-handle {
+  position: absolute;
+  right: 6px;
+  pointer-events: all;
+}
