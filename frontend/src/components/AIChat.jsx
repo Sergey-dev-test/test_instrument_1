@@ -18,7 +18,7 @@ import SendIcon from '@mui/icons-material/Send';
 import PersonIcon from '@mui/icons-material/Person';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import DeleteIcon from '@mui/icons-material/Delete';
-import CopyIcon from '@mui/icons-material/Copy';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CloseIcon from '@mui/icons-material/Close';
 
 /**
@@ -298,7 +298,7 @@ const AIChat = ({ config, onClose }) => {
                   {msg.role === 'assistant' && (
                     <Tooltip title="Копировать">
                       <IconButton size="small" onClick={() => handleCopy(msg.content)}>
-                        <CopyIcon fontSize="small" />
+                        <ContentCopyIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
                   )}

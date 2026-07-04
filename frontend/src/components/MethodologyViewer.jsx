@@ -9,7 +9,6 @@ import {
   CircularProgress,
   IconButton,
 } from '@mui/material';
-import { Markdown } from 'react-admin';
 
 /**
  * Компонент отображения методики ведения таблицы
@@ -89,7 +88,9 @@ const MethodologyViewer = ({ resource }) => {
           {loading ? (
             <CircularProgress />
           ) : (
-            <Markdown content={methodology} />
+            <Box sx={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>
+              {methodology}
+            </Box>
           )}
         </Box>
       </Modal>
