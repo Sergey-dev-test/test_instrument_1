@@ -1,0 +1,140 @@
+/* ─── Canvas Container ──────────────────────────────────────── */
+
+.canvas-container {
+  flex: 1;
+  height: 100%;
+  position: relative;
+}
+
+.canvas-container .react-flow__pane {
+  cursor: grab;
+  background: var(--color-bg);
+}
+
+.canvas-container .react-flow__pane:active {
+  cursor: grabbing;
+}
+
+.canvas-container .react-flow__node {
+  cursor: default;
+}
+
+.canvas-container .react-flow__edge {
+  cursor: pointer;
+}
+
+/* ─── MiniMap Customization ─────────────────────────────────── */
+
+.canvas-container .react-flow__minimap {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+/* ─── Controls Customization ────────────────────────────────── */
+
+.canvas-container .react-flow__controls {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background: var(--color-surface);
+  border: none;
+}
+
+.canvas-container .react-flow__controls button {
+  border: none;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.canvas-container .react-flow__controls button:last-child {
+  border-bottom: none;
+}
+
+.canvas-container .react-flow__controls button:hover {
+  background: var(--color-surface-hover);
+}
+
+/* ─── Relationship Modal Overrides ───────────────────────────── */
+
+.canvas-container .relationship-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--color-bg);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.preview-table {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: monospace;
+  color: var(--color-accent);
+  padding: 4px 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+}
+
+.preview-arrow {
+  font-size: 20px;
+  color: var(--color-text-muted);
+}
+
+.canvas-container .options-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+}
+
+.canvas-container .options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.canvas-container .option-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.canvas-container .option-btn:hover {
+  border-color: var(--color-accent);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.canvas-container .option-icon {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: monospace;
+  min-width: 60px;
+  color: var(--color-accent);
+}
+
+.canvas-container .option-label {
+  font-size: 13px;
+  font-weight: 500;
+}

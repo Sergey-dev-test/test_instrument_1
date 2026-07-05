@@ -1,0 +1,53 @@
+/* ─── Connection Path ───────────────────────────────────────── */
+
+.connection-path {
+  fill: none;
+  stroke: var(--color-text-muted);
+  transition: stroke 0.2s ease, stroke-width 0.2s ease;
+  cursor: pointer;
+}
+
+.connection-path:hover {
+  stroke: var(--color-accent);
+  stroke-width: 3;
+}
+
+.connection-path.selected {
+  stroke: var(--color-accent);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.4));
+}
+
+/* ─── Edge Label ────────────────────────────────────────────── */
+
+.edge-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edge-label-btn {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.15s ease;
+}
+
+.edge-label:hover .edge-label-btn {
+  opacity: 1;
+}
+
+.edge-label-btn:hover {
+  background: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+}
