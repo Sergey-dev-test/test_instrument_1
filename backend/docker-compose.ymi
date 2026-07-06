@@ -1,0 +1,63 @@
+# src/docker-compose.yml
+
+version: '3.8'
+
+services:
+  # PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_DB: instrument_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - instrument_network
+
+  # Redis (для токенов)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - instrument_network
+
+  # Backend (FastAPI)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres_password@postgres:5432/instrument_db
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=your-secret-key-here
+      - FERNET_KEY=your-fernet-key-here
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - instrument_network
+
+  # Frontend (Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - instrument_network
+
+volumes:
+  postgres_data:
+
+networks:
+  instrument_network:
+    driver: bridge

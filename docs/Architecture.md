@@ -1,0 +1,357 @@
+# АРХИТЕКТУРА СИСТЕМЫ
+[User Browser]
+↓
+[Frontend (React)]  ← (Vite, TypeScript, React Router)
+↓ HTTP (Axios)
+[Backend (FastAPI)] ← (UVICORN, SQLAlchemy, PostgreSQL/MySQL)
+↓
+[External DB] (PostgreSQL / MySQL)
+↓
+[MockAI / OpenAI] (AI Agent)
+
+## 1. ОБЩАЯ АРХИТЕКТУРА
+
+Система построена на основе модульной архитектуры с разделением на три основных компонента:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     КЛИЕНТ (Frontend)                       │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────┐   │
+│  │  Подключение │ │  Таблицы │ │  SQL     │ │  ИИ-Агент  │   │
+│  │  БД      │ │  и связи │ │  Генератор│ │  Чат       │   │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────────┘   │
+└────────────────────────────┬────────────────────────────────┘
+                             │ REST API (JSON)
+┌────────────────────────────┴────────────────────────────────┐
+│                     БЭКЕНД (Backend)                        │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────┐   │
+│  │  Auth    │ │  DB      │ │  SQL     │ │  AI          │   │
+│  │  Module  │ │  Analyzer│ │  Generator│ │  Connector   │   │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────────┘   │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────┐   │
+│  │  Role    │ │  Excel   │ │  Method  │ │  Log         │   │
+│  │  Manager │ │  Loader  │ │  Generator│ │  Service     │   │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────────┘   │
+└────────────────────────────┬────────────────────────────────┘
+                             │
+           ┌─────────────────┼─────────────────┐
+           │                 │                 │
+    ┌──────┴──────┐  ┌──────┴──────┐  ┌──────┴──────┐
+    │  PostgreSQL │  │  Внешние   │  │  ИИ-Агент   │
+    │  (метаданные)│  │  СУБД      │  │  (API)      │
+    └─────────────┘  └─────────────┘  └─────────────┘
+```
+
+## 2. МОДУЛЬНАЯ СТРУКТУРА
+### 2.1 Frontend (React)
+- **Представление:** `pages/`, `components/`  
+- **Управление состоянием:** Context API + Zustand  
+- **Коммуникация:** `axios` → `/api/v1/*`  
+- **Маршрутизация:** `react-router-dom`  
+
+### 2.2 Backend (FastAPI)
+- **API-роуты:** `api/v1/`  
+- **Сервисы:** `services/` (бизнес-логика)  
+- **Модели:** `models/` (SQLAlchemy)  
+- **Схемы:** `schemas/` (Pydantic)  
+- **Репозитории:** `repositories/` (CRUD)  
+
+### 2.3 База данных
+- **ПостgreSQL/MySQL** → `user`, `connection`, `table`, `custom_table`, `sql`, `method`, `ai`, `audit`  
+- **Шифрование паролей:** Fernet (в `config/database.py`)  
+
+### 2.4 AI-агент
+- **MockAI:** Локальная имитация (для MVP)  
+- **OpenAI (prod):** Подключение через API ключ  
+
+### 2.1. Backend Modules
+
+```
+backend/
+├── main.py                 # Точка входа
+├── config/                 # Конфигурация
+│   ├── settings.py         # Настройки приложения
+│   ├── database.py         # Подключение к БД
+│   └── security.py         # Настройки безопасности
+├── api/                    # API endpoints
+│   ├── v1/
+│   │   ├── auth.py         # Аутентификация
+│   │   ├── db.py           # Управление БД
+│   │   ├── tables.py       # Управление таблицами
+│   │   ├── sql.py          # Генерация SQL
+│   │   ├── methods.py      # Генерация методик
+│   │   ├── excel.py        # Загрузка Excel
+│   │   └── ai.py           # API для ИИ-агента
+├── core/                   # Ядро системы
+│   ├── auth.py             # Логика аутентификации
+│   ├── security.py         # Шифрование, хеширование
+│   └── dependencies.py     # Зависимости FastAPI
+├── models/                 # Модели данных
+│   ├── user.py             # Модель пользователя
+│   ├── table.py            # Модель таблицы
+│   ├── field.py            # Модель поля
+│   └── connection.py       # Модель подключения
+├── schemas/                # Pydantic схемы
+│   ├── user.py
+│   ├── table.py
+│   ├── sql.py
+│   └── ai.py
+├── services/               # Бизнес-логика
+│   ├── db_service.py       # Работа с БД
+│   ├── analyzer_service.py # Анализ структуры
+│   ├── sql_service.py      # Генерация SQL
+│   ├── method_service.py   # Генерация методик
+│   ├── excel_service.py    # Загрузка Excel
+│   └── ai_service.py       # Работа с ИИ
+├── repositories/           # Работа с данными
+│   ├── user_repo.py
+│   ├── table_repo.py
+│   └── connection_repo.py
+├── utils/                  # Утилиты
+│   ├── sql_generator.py    # Генератор SQL
+│   ├── method_generator.py # Генератор методик
+│   └── excel_parser.py     # Парсер Excel
+└── tests/                  # Тесты
+```
+
+### 2.2. Frontend Modules
+
+```
+frontend/
+├── src/
+│   ├── main.tsx            # Точка входа
+│   ├── App.tsx             # Корневой компонент
+│   ├── components/         # React компоненты
+│   │   ├── common/         # Общие компоненты
+│   │   │   ├── Button.tsx
+│   │   │   ├── Input.tsx
+│   │   │   └── Modal.tsx
+│   │   ├── connection/     # Модуль подключения
+│   │   │   ├── ConnectionForm.tsx
+│   │   │   └── DatabaseSearch.tsx
+│   │   ├── tables/         # Модуль таблиц
+│   │   │   ├── TableTree.tsx
+│   │   │   ├── TableViewer.tsx
+│   │   │   └── ConnectionGraph.tsx
+│   │   ├── sql/            # Модуль SQL
+│   │   │   ├── SQLGenerator.tsx
+│   │   │   └── SQLPreview.tsx
+│   │   ├── methods/        # Модуль методик
+│   │   │   ├── MethodViewer.tsx
+│   │   │   └── MethodExport.tsx
+│   │   ├── excel/          # Модуль Excel
+│   │   │   └── ExcelUploader.tsx
+│   │   └── ai/             # Модуль ИИ
+│   │       └── AIChat.tsx
+│   ├── pages/              # Страницы
+│   │   ├── WelcomePage.tsx     # Приветственное окно
+│   │   ├── MainPage.tsx        # Основной интерфейс
+│   │   └── SettingsPage.tsx    # Настройки
+│   ├── services/           # API сервисы
+│   │   ├── api.ts          # Базовый API клиент
+│   │   ├── auth.service.ts
+│   │   ├── db.service.ts
+│   │   └── ai.service.ts
+│   ├── store/              # Управление состоянием
+│   │   ├── authSlice.ts
+│   │   ├── dbSlice.ts
+│   │   └── aiSlice.ts
+│   ├── types/              # TypeScript типы
+│   │   ├── user.ts
+│   │   ├── table.ts
+│   │   └── ai.ts
+│   └── utils/              # Утилиты
+│       ├── formatters.ts
+│       └── validators.ts
+└── public/
+```
+
+## 3. АРХИТЕКТУРНЫЕ ПАТТЕРНЫ
+
+### 3. Потоки данных
+
+### 3.1 Вход пользователя
+Пользователь вводит логин/пароль
+→ POST /api/v1/auth/login
+Backend: проверка → JWT + Refresh Token → сохраняются в localStorage
+Frontend: сохраняет токен → показывает dashboard
+
+### 3.2 Синхронизация таблиц
+Пользователь нажимает "Синхронизировать все"
+→ POST /api/v1/tables/sync?connection_id=...
+Backend: подключается к БД через psycopg2/aiomysql
+→ считывает метаданные (SELECT * FROM information_schema.columns)
+→ сохраняет в таблицы: table, field
+Возвращает структуру → Frontend обновляет список
+
+### 3.3 Генерация SQL
+Пользователь вводит: "покажи активных пользователей"
+→ POST /api/v1/sql/generate?table_name=users
+Backend: MockAI анализирует запрос
+→ генерирует SQL: SELECT * FROM users WHERE status = 'active'
+Возвращает: sql, description
+
+## 4. ВЗАИМОДЕЙСТВИЕ МОДУЛЕЙ
+
+┌─────────────┐      ┌─────────────┐
+│   User      │      │ Connection  │
+│-------------│      │-------------│
+│ id          │◄─────│ owner_id    │
+│ username    │      │ name        │
+│ email       │      │ db_type     │
+│ password    │      │ host        │
+│ role        │      │ port        │
+└─────────────┘      │ database    │
+│ username    │
+│ password    │
+└─────────────┘
+│
+▼
+┌─────────────┐      ┌─────────────┐
+│   Table     │      │ CustomTable │
+│-------------│      │-------------│
+│ id          │◄─────│ id          │
+│ connection_ │      │ table_name  │
+│   id        │      │ description │
+│ name        │      │ created_by  │
+│ description │      └─────────────┘
+│ row_count   │             ▲
+└─────────────┘             │
+│                    │
+▼                    │
+┌─────────────┐             │
+│   Field     │◄────────────┘
+│-------------│
+│ table_id    │
+│ name        │
+│ data_type   │
+│ is_pk       │
+│ is_null     │
+└─────────────┘
+
+
+> 📌 Связи:  
+> - `User` → `Connection` (1:N)  
+> - `Connection` → `Table` (1:N)  
+> - `Table` → `Field` (1:N)  
+> - `User` → `CustomTable` (1:1)  
+
+
+### 4.1. Процесс подключения к БД
+
+```
+1. Пользователь вводит данные в ConnectionForm
+2. Frontend отправляет запрос на POST /api/v1/db/test-connection
+3. Backend валидирует данные через Pydantic schema
+4. DB Service пытается подключиться к БД
+5. Analyzer Service сканирует структуру БД
+6. Результат возвращается фронтенду
+7. Frontend отображает дерево таблиц
+```
+
+### 4.2. Процесс генерации SQL
+
+```
+1. Пользователь выбирает таблицу
+2. Frontend отправляет запрос на POST /api/v1/sql/generate
+3. Backend получает структуру таблицы из кэша/БД
+4. SQL Service генерирует запрос
+5. Результат возвращается фронтенду
+6. Пользователь может отредактировать и выполнить
+```
+
+### 4.3. Процесс работы с ИИ
+
+```
+1. Пользователь отправляет запрос в чате
+2. Frontend отправляет POST /api/v1/ai/chat
+3. Backend формирует промпт
+4. Запрос пересылается внешнему ИИ-агенту
+5. Ответ ИИ возвращается пользователю
+```
+
+## 5. МАСШТАБИРУЕМОСТЬ
+ Компонент | Реализация |
+|-----------|------------|
+| Аутентификация | JWT + Refresh Tokens |
+| Шифрование паролей | Fernet (в `config/database.py`) |
+| CORS | `ALLOWED_ORIGINS` в `settings.py` |
+| XSS | Валидация на backend (Pydantic) |
+| CSRF | Отключён (API-приложение) |
+
+### 5.1. Горизонтальное масштабирование
+- Stateless бэкенд позволяет запускать несколько инстансов
+- Redis для сессий и кэширования
+- Балансировка нагрузки (Nginx/Kubernetes)
+
+### 5.2. Вертикальное масштабирование
+- Оптимизация запросов к БД
+- Кэширование структуры БД в Redis
+- Асинхронная обработка тяжёлых операций (Celery)
+
+### 5.3. Кэширование
+```
+Уровни кэширования:
+1. Redis - структура БД, сессии, временные данные
+2. Browser cache - статические ресурсы
+3. API response cache - частые запросы
+```
+
+## 6. ОБРАБОТКА ОШИБОК
+GitHub Push
+→ CI: pytest, ESLint
+→ Build Docker images
+→ Deploy to prod server (nginx + docker-compose)
+### 6.1. Backend
+- Единый формат ошибок в API
+- Логирование всех исключений
+- Graceful degradation при недоступности компонентов
+
+### 6.2. Frontend
+- User-friendly сообщения об ошибках
+- Retry mechanism для сетевых запросов
+- Fallback UI при недоступности API
+
+## 7. БЕЗОПАСНОСТЬ
+
+### 7.1. Аутентификация
+- JWT токены (access + refresh)
+- HTTP-only cookies для refresh token
+- Автоматическая ротация токенов
+
+### 7.2. Авторизация
+- RBAC (Role-Based Access Control)
+- Декораторы для проверки прав
+- Проверка на уровне API и UI
+
+### 7.3. Защита данных
+- Шифрование паролей БД (AES-256)
+- Хеширование паролей пользователей (bcrypt)
+- HTTPS для всех соединений
+- Защита от SQL-инъекций (параметризованные запросы)
+
+## 8. Мониторинг и логирование
+
+### 8.1. Логирование
+```python
+# Структура логов
+{
+    "timestamp": "2024-01-01T00:00:00Z",
+    "level": "INFO",
+    "user_id": "123",
+    "action": "db_connect",
+    "details": {...},
+    "ip": "192.168.1.1"
+}
+```
+
+### 8.2. Метрики
+- Время отклика API
+- Количество активных подключений
+- Ошибки и исключения
+- Использование ресурсов
+
+---
+**Версия:** 1.0
+**Дата:** 2024
+**Автор:** Architecture Team
