@@ -1,7 +1,10 @@
 ﻿from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, declarative_base
 from config.settings import settings
+from utils.logger import setup_logger
+
+# Настройка логгера
+logger = setup_logger("instrument.database")
 
 # Ссылки на asyncpg (PostgreSQL) и aiomysql (MySQL)
 DB_URLS = {
@@ -11,6 +14,9 @@ DB_URLS = {
 
 # Основная БД проекта (PostgreSQL по умолчанию)
 PROJECT_DB_URL = DB_URLS["POSTGRES"]
+
+logger.info(f"Инициализация БД: {settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}")
+logger.info(f"Драйвер: asyncpg (PostgreSQL)")
 
 engine = create_async_engine(PROJECT_DB_URL, echo=settings.DEBUG, future=True)
 async_session_factory = sessionmaker(
@@ -23,5 +29,13 @@ Base = declarative_base()
 
 
 async def get_db() -> AsyncSession:
+    """Получение сессии БД с логированием."""
+    logger.debug("Открытие сессии БД")
     async with async_session_factory() as session:
-        yield session
+        try:
+            yield session
+            logger.debug("Сессия БД успешно закрыта")
+        except Exception as e:
+            logger.error(f"Ошибка сессии БД: {e}")
+            await session.rollback()
+            raise

@@ -14,6 +14,9 @@ from schemas.user import UserCreate, UserLogin, TokenResponse
 from repositories.user_repo import UserRepo
 from config.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
+from utils.logger import setup_logger
+
+logger = setup_logger("instrument.api.auth")
 
 router = APIRouter()
 
@@ -27,9 +30,11 @@ async def register(
     user_data: UserCreate,
     db: AsyncSession = Depends(get_db)
 ):
-    """Регистрация нового пользователя"""
+    """Регистрация нового пользователя."""
+    logger.info(f"Запрос регистрации: {user_data.username}")
     user = await UserRepo.get_by_username(db, user_data.username)
     if user:
+        logger.warning(f"Пользователь уже существует: {user_data.username}")
         raise HTTPException(status_code=400, detail="Пользователь с таким логином уже существует")
     user = await UserRepo.create(
         db,
@@ -37,6 +42,7 @@ async def register(
         email=user_data.email,
         password=user_data.password
     )
+    logger.info(f"Пользователь создан: {user_data.username} (ID: {user.id})")
     return {"message": "Пользователь создан", "user_id": str(user.id)}
 
 
@@ -45,9 +51,11 @@ async def login(
     user_data: UserLogin,
     db: AsyncSession = Depends(get_db)
 ):
-    """Аутентификация пользователя"""
+    """Аутентификация пользователя."""
+    logger.info(f"Запрос входа: {user_data.username}")
     user = await UserRepo.get_by_username(db, user_data.username)
     if not user or not verify_password(user_data.password, user.password_hash):
+        logger.warning(f"Неверный логин или пароль: {user_data.username}")
         raise HTTPException(status_code=401, detail="Неверный логин или пароль")
     
     access_token = create_access_token({
@@ -58,6 +66,7 @@ async def login(
     })
     refresh_token = create_refresh_token({"sub": str(user.id)})
     
+    logger.info(f"Пользователь вошёл в систему: {user.username}")
     return {
         "access_token": access_token,
         "refresh_token": refresh_token,
@@ -69,14 +78,17 @@ async def login(
 async def refresh_token(
     data: TokenRefreshRequest
 ):
-    """Обновление access-токена через refresh"""
-    payload = verify_token(data.refresh_token)
+    """Обновление access-токена через refresh."""
+    logger.debug("Запрос обновления токена")
+    payload = verify_token(data.refresh_token, expected_type="refresh")
     if not payload or "sub" not in payload:
+        logger.warning("Недействительный refresh-токен")
         raise HTTPException(status_code=401, detail="Недействительный refresh-токен")
     
     new_access = create_access_token({"sub": payload["sub"]})
     new_refresh = create_refresh_token({"sub": payload["sub"]})
     
+    logger.debug("Токен успешно обновлён")
     return {
         "access_token": new_access,
         "refresh_token": new_refresh,
@@ -86,5 +98,6 @@ async def refresh_token(
 
 @router.post("/logout")
 async def logout():
-    """Мок эндпоинт — в MVP токены не валидируются на сервере (используется только JWT-срок действия)"""
+    """Мок эндпоинт — в MVP токены не валидируются на сервере (используется только JWT-срок действия)."""
+    logger.debug("Запрос выхода (mock)")
     return {"message": "Выход выполнен (в production здесь — удаление refresh-токена из кэша)"}

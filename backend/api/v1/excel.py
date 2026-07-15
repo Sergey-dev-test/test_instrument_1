@@ -6,6 +6,9 @@ import uuid
 from services.excel_service import ExcelService
 from core.dependencies import get_current_user
 from schemas.excel import ExcelConfirm
+from utils.logger import setup_logger
+
+logger = setup_logger("instrument.api.excel")
 
 router = APIRouter()
 
@@ -15,7 +18,11 @@ async def upload_excel(
     file: UploadFile = File(...),
     user=Depends(get_current_user)
 ):
+    """Загрузка и валидация Excel-файла."""
+    logger.info(f"Пользователь {user.id} загружает файл: {file.filename}")
+    
     if not file.filename.endswith(('.xlsx', '.xls')):
+        logger.warning(f"Неподдерживаемый формат файла: {file.filename}")
         raise HTTPException(status_code=400, detail="Только .xlsx и .xls файлы")
     
     # Сохранение файла
@@ -24,14 +31,25 @@ async def upload_excel(
     with open(file_path, "wb") as f:
         f.write(await file.read())
     
+    logger.info(f"Файл сохранён: {file_path}")
+    
     # Парсинг и валидация
     result = ExcelService.parse_excel(file_path)
     
     # Очистка
     Path(file_path).unlink(missing_ok=True)
+    logger.info(f"Файл удалён: {file_path}")
     
     if result.get("errors"):
+        logger.error(f"Ошибки валидации файла {file.filename}: {result['errors']}")
         raise HTTPException(status_code=400, detail=result["errors"])
+    
+    logger.info(
+        f"Файл валиден: {file.filename}, "
+        f"таблица: {result['table_name']}, "
+        f"строк: {result['row_count']}, "
+        f"полей: {len(result['fields'])}"
+    )
     
     return {
         "message": "Файл валиден",

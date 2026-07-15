@@ -5,7 +5,7 @@ from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from datetime import datetime
 from config.database import Base
-from config.settings import DBType
+from schemas.types import DBType
 
 
 class DatabaseConnection(Base):

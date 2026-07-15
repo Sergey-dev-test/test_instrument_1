@@ -2,18 +2,13 @@
 
 from pydantic_settings import BaseSettings
 from typing import List
-from enum import Enum
-
-
-class DBType(str, Enum):
-    POSTGRES = "POSTGRES"
-    MYSQL = "MYSQL"
+from schemas.types import DBType
 
 
 class Settings(BaseSettings):
     # App
     PROJECT_NAME: str = "DB Manager"
-    VERSION: str = "0.1.0"
+    VERSION: str = "0.2.0"
     DEBUG: bool = False
     APP_DEBUG: bool = False
     API_V1_PREFIX: str = "/api/v1"

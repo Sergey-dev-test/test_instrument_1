@@ -2,13 +2,8 @@
 
 from pydantic import BaseModel, Field
 from typing import Optional
-from enum import Enum
 from datetime import datetime
-
-
-class DBType(str, Enum):
-    POSTGRES = "POSTGRES"
-    MYSQL = "MYSQL"
+from .types import DBType
 
 
 class ConnectionBase(BaseModel):
@@ -45,5 +40,9 @@ class Connection(ConnectionBase):
     created_at: datetime
     last_connected: Optional[datetime] = None
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
+
+    def model_dump(self, **kwargs):
+        data = super().model_dump(**kwargs)
+        data.pop("password_encrypted", None)
+        return data

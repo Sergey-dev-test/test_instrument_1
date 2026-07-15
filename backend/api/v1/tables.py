@@ -1,6 +1,6 @@
 ﻿# backend/api/v1/tables.py
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.dependencies import get_current_user
@@ -9,8 +9,16 @@ from repositories.table_repo import TableRepo
 from config.database import get_db
 from schemas.table import TableInDB, FieldInDB
 from models.connection import DatabaseConnection
+from pydantic import BaseModel
+from utils.logger import setup_logger
+
+logger = setup_logger("instrument.api.tables")
 
 router = APIRouter()
+
+
+class SyncRequest(BaseModel):
+    connection_id: str
 
 
 @router.get("/", response_model=list[TableInDB])
@@ -55,31 +63,50 @@ async def get_table_fields(
 
 @router.post("/sync")
 async def sync_tables(
-    connection_id: str,
+    request: SyncRequest,
     db: AsyncSession = Depends(get_db),
     user=Depends(get_current_user)
 ):
-    """Синхронизация структуры таблиц из внешней СУБД"""
+    """Синхронизация структуры таблиц из внешней СУБД."""
+    logger.info(
+        f"Пользователь {user.id} запускает синхронизацию для подключения {request.connection_id}"
+    )
+    
     result = await db.execute(
         select(DatabaseConnection).where(
-            DatabaseConnection.id == connection_id,
+            DatabaseConnection.id == request.connection_id,
             DatabaseConnection.user_id == user.id
         )
     )
     connection = result.scalar_one_or_none()
     if not connection:
+        logger.warning(
+            f"Подключение {request.connection_id} не найдено для пользователя {user.id}"
+        )
         raise HTTPException(status_code=404, detail="Подключение не найдено")
 
-    result = await DBService.sync_structure(
-        db_session=db,
-        connection_id=connection_id,
-        user_id=user.id,
-        db_type=connection.db_type,
-        host=connection.host,
-        port=connection.port,
-        db_name=connection.database_name,
-        username=connection.username,
-        password_encrypted=connection.password_encrypted
-    )
+    from core.security import decrypt_db_password
 
-    return result
+    password = decrypt_db_password(connection.password_encrypted) if connection.password_encrypted else ""
+
+    logger.info(
+        f"Начало синхронизации: {connection.db_type}://{connection.host}:{connection.port}/{connection.database_name}"
+    )
+    
+    try:
+        result = await DBService.sync_structure(
+            db_session=db,
+            connection_id=connection.id,
+            user_id=user.id,
+            db_type=connection.db_type,
+            host=connection.host,
+            port=connection.port,
+            db_name=connection.database_name,
+            username=connection.username or "",
+            password_encrypted=password
+        )
+        logger.info(f"Синхронизация завершена: {result}")
+        return result
+    except Exception as e:
+        logger.error(f"Ошибка синхронизации: {e}")
+        raise HTTPException(status_code=500, detail=f"Ошибка синхронизации: {str(e)}")

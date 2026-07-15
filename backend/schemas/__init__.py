@@ -6,3 +6,4 @@ from .table import TableInDB, FieldInDB
 from .excel import ValidationField, ExcelUpload, ExcelConfirm
 from .sql import SQLRequest, SQLResponse
 from .method import MethodCreate, Method
+from .types import DBType

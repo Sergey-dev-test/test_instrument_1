@@ -28,7 +28,7 @@ services:
   # Backend (FastAPI)
   backend:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
     environment:
       - DATABASE_URL=postgresql://postgres:postgres_password@postgres:5432/instrument_db

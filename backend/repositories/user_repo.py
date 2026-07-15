@@ -2,53 +2,48 @@
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from models.user import User as UserModel
+from models.user import User
 from schemas.user import UserCreate
 from core.security import hash_password
+from utils.logger import setup_logger
+
+logger = setup_logger("instrument.repo.user")
 from core.enums import Role
 
 
 class UserRepo:
     @staticmethod
-    async def get_by_username(session: AsyncSession, username: str) -> UserModel:
-        result = await session.execute(select(UserModel).where(UserModel.username == username))
-        return result.scalar_one_or_none()
+    async def get_by_username(session: AsyncSession, username: str) -> User:
+        logger.debug(f"Поиск пользователя по имени: {username}")
+        result = await session.execute(select(User).where(User.username == username))
+        user = result.scalar_one_or_none()
+        if user:
+            logger.debug(f"Пользователь найден: {username}")
+        else:
+            logger.debug(f"Пользователь не найден: {username}")
+        return user
 
     @staticmethod
-    async def get_by_email(session: AsyncSession, email: str) -> UserModel:
-        result = await session.execute(select(UserModel).where(UserModel.email == email))
-        return result.scalar_one_or_none()
+    async def get_by_id(session: AsyncSession, user_id: str) -> User:
+        logger.debug(f"Поиск пользователя по ID: {user_id}")
+        result = await session.execute(select(User).where(User.id == user_id))
+        user = result.scalar_one_or_none()
+        if user:
+            logger.debug(f"Пользователь найден: {user_id}")
+        return user
 
     @staticmethod
-    async def create(
-        session: AsyncSession,
-        username: str,
-        email: str,
-        password: str,
-    ) -> UserModel:
-        # Проверка уникальности username
-        existing = await session.execute(
-            select(UserModel).where(UserModel.username == username)
-        )
-        if existing.scalar_one_or_none():
-            raise ValueError(f"Пользователь '{username}' уже существует")
-
-        # Проверка уникальности email
-        existing_email = await session.execute(
-            select(UserModel).where(UserModel.email == email)
-        )
-        if existing_email.scalar_one_or_none():
-            raise ValueError(f"Email '{email}' уже используется")
-
-        db_user = UserModel(
-            username=username,
-            email=email,
-            password_hash=hash_password(password),
-            role=Role.USER
+    async def create(session: AsyncSession, user_data: UserCreate) -> User:
+        logger.info(f"Создание пользователя: {user_data.username}")
+        db_user = User(
+            username=user_data.username,
+            email=user_data.email,
+            password_hash=hash_password(user_data.password)
         )
         session.add(db_user)
         await session.commit()
         await session.refresh(db_user)
+        logger.info(f"Пользователь создан: {db_user.id}")
         return db_user
 
     @staticmethod

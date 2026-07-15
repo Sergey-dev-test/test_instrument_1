@@ -8,6 +8,9 @@ from config.database import get_db
 from core.security import verify_token
 from core.enums import Role
 from repositories.user_repo import UserRepo
+from utils.logger import setup_logger
+
+logger = setup_logger("instrument.security.dependencies")
 
 
 security = HTTPBearer()
@@ -17,18 +20,23 @@ async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db = Depends(get_db)
 ):
-    """Проверяет JWT-токен и возвращает текущего пользователя"""
+    """Проверяет JWT-токен и возвращает текущего пользователя."""
     token = credentials.credentials
-    payload = verify_token(token)
+    logger.debug("Проверка JWT-токена")
+    payload = verify_token(token, expected_type="access")
     if not payload or "sub" not in payload:
+        logger.warning("Недействительный JWT-токен")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Недействительный токен"
         )
     user_id = payload["sub"]
+    logger.debug(f"Пользователь найден по токену: {user_id}")
     user = await UserRepo.get_by_id(db, user_id)
     if not user or not user.is_active:
+        logger.warning(f"Пользователь не найден или отключён: {user_id}")
         raise HTTPException(status_code=401, detail="Пользователь не найден или отключён")
+    logger.debug(f"Пользователь авторизован: {user.username}")
     return user
 
 
