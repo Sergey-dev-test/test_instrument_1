@@ -1,6 +1,6 @@
 // src/App.tsx
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -25,13 +25,16 @@ import AIChat from './pages/ai/AIChat';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <div className="min-h-screen bg-gray-50">
           <Navbar />
 
           <main className="pt-6 pb-12">
             <Routes>
+              {/* Root redirect */}
+              <Route path="/" element={<Navigate to="/login" replace />} />
+
               {/* Auth */}
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
@@ -49,11 +52,14 @@ function App() {
               <Route path="/tables/:tableId/methods" element={<ProtectedRoute><MethodList /></ProtectedRoute>} />
               <Route path="/tables/:tableId/methods/:methodId?" element={<ProtectedRoute><MethodForm /></ProtectedRoute>} />
               <Route path="/ai" element={<ProtectedRoute><AIChat /></ProtectedRoute>} />
+
+              {/* Fallback */}
+              <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
           </main>
         </div>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 
