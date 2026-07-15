@@ -1,6 +1,12 @@
 ## src/backend/main.py
 
+import sys
 import os
+
+# Добавляем директорию backend в sys.path, чтобы импорты работали
+# независимо от того, откуда запущен скрипт (из backend/ или из корня проекта)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 

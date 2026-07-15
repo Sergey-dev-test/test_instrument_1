@@ -69,8 +69,9 @@ if not exist "backend\venv" (
 )
 call backend\venv\Scripts\activate.bat
 
-REM Устанавливаем UTF-8 для pip
+REM Устанавливаем UTF-8 для pip и PYTHONPATH для импортов
 set PYTHONUTF8=1
+set PYTHONPATH=%CD%\backend
 
 echo      Установка зависимостей backend...
 pip install -r backend\requirements.txt

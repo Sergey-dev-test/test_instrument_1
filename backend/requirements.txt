@@ -11,20 +11,20 @@ python-multipart==0.0.9
 fpdf2==2.7.9
 
 
-# Драйверы БД (PostgreSQL + MySQL только!)
+# DB drivers (PostgreSQL + MySQL)
 asyncpg==0.29.0
 aiomysql==0.2.0
 
-# Excel + валидация
+# Excel + validation
 openpyxl==3.1.2
 pandas==2.1.4
 
-# Вспомогательное
-cryptography==42.0.4    # Для Fernet
-httpx==0.26.0          # Для AI API (если в будущем подключим внешний)
-requests==2.31.0       # Для OpenAI API
+# Utils
+cryptography==42.0.4    # For Fernet
+httpx==0.26.0           # For AI API
+requests==2.31.0        # For OpenAI API
 
-# Очередь и кэш (опционально для MVP)
+# Queue and cache (optional for MVP)
 redis==5.0.3
 celery[redis]==5.3.6
 

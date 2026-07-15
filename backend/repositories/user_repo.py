@@ -45,8 +45,3 @@ class UserRepo:
         await session.refresh(db_user)
         logger.info(f"Пользователь создан: {db_user.id}")
         return db_user
-
-    @staticmethod
-    async def get_by_id(session: AsyncSession, user_id) -> UserModel:
-        result = await session.execute(select(UserModel).where(UserModel.id == user_id))
-        return result.scalar_one_or_none()
